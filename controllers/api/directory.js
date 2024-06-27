@@ -1,6 +1,9 @@
 
-// 4.1.8 - added this line of code
-const { isLoggedIn, hasProfile } = require('../../utils/auth');  
+
+const multer = require('multer'); // 4.2.4 - added this line of code
+const { upload } = require('../../config/multer'); // 4.2.4 - added this line of code
+
+const { isLoggedIn, hasProfile } = require('../../utils/auth');  // 4.1.8 - added this line of code
 const router = require('express').Router();
 require('dotenv').config();
 const { Person, Address } = require('../../models');
@@ -18,6 +21,7 @@ router.get('/', isLoggedIn, async (req, res) => {
   }
 });
 
+/*
 // 4.1.8 - added the "hasProfile" middleware to the post route - to prevent logged-in users from creating multiple profile entries in the database
 router.post('/', hasProfile, async (req, res) => {
   try {
@@ -58,6 +62,59 @@ router.post('/', hasProfile, async (req, res) => {
     res.status(500).end();
   }
 });
+*/
+
+
+
+
+
+
+
+// replace the above code with the below code added at section 4.2.4
+// We need to wrap the POST route using the upload function so that we get access to the req.file object provided by multer.
+router.post('/', hasProfile, async (req, res) => {
+  upload(req, res, async (err) => { 
+
+    // added the below error code at 4.2.5
+    // added any errors that may occur during the file upload process to thefront-end
+    if (err instanceof multer.MulterError) {
+      return res.json({ error: 'File too large! Must be under 1MB' });
+    } else if (err) {
+      return res.json({ error: err.message });
+    }
+
+
+
+    const imgPath = req.file.path.replace('public', '');
+
+    const newPersonEntry = {
+      first_name: req.body.first_name,
+      last_name: req.body.last_name,
+      phone: req.body.phone,
+      github_id: req.user.github_id,
+      avatar: imgPath,
+    };
+
+    const personsAddress = {
+      street: req.body.street,
+      city: req.body.city,
+      state: req.body.state,
+    };
+
+    const { rows } = await Person.create(newPersonEntry);
+
+    await Address.create({
+      ...personsAddress,
+      person_id: rows[0].id,
+    });
+
+    req.login(newPersonEntry, () => {
+      res.status(200).json({ message: 'Success' });
+    });
+  });
+});
+
+
 
 
 module.exports = router;

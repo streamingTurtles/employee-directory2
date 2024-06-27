@@ -33,6 +33,11 @@ const PORT = process.env.PORT || 3001;
 const passport = require('passport');
 require('./config/passport');
 
+// added in 4.2.6 to prevent hotlinking
+const hotlink = require('./utils/hotlink');
+
+
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -56,6 +61,9 @@ app.use(serverSession);
 // added in 4.1.6
 app.use(passport.initialize());
 app.use(passport.session());
+// added in 4.2.6
+app.use(hotlink);
+
 
 
 
