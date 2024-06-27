@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS people (
   first_name TEXT NOT NULL,
   last_name TEXT NOT NULL,
   phone TEXT,
+  avatar TEXT,  /* at 4.2.3 added avatar field, accomodates avatar update in Person.js model */
   github_id TEXT NOT NULL
 );
 

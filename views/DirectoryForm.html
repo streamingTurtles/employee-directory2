@@ -89,8 +89,18 @@
           placeholder="State / Providence"
           required
         />
+  
+  
+        <!--  added from sectin 4.2.4 
+        to account for the image upload, then update
+        the response in public/scripts/form.js after this addition
+        to the frontend  -->
+        <label for="avatar">Profile Picture <span class="small-text">(under 1MB)</span></label>
+  <input type="file" name="avatar" id="avatar" class="form-control" required />
 
-       
+
+
+
 
         <div class="submit">
           <button class="btn btn-lg btn-black" type="submit">Submit</button>
